@@ -6,11 +6,10 @@ import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from torch import Tensor
 
-from Unet.Unet_mask import UNetSTFTComplexRefine
-from conf import aasist_conf,chunk_size
-from waveunet import Waveunet
+
+from Unet_mask import UNetSTFTComplexRefine
+from conf import aasist_conf
 
 from XLSR2_AASIST import XLSR2_AASIST, SSLModel
 
@@ -19,18 +18,13 @@ class Model(nn.Module):
     def __init__(self, device='cuda'):
         super().__init__()
         self.device = device
-        # self.spar = Waveunet()
         self.spar = UNetSTFTComplexRefine()
-        # self.ssl_model = SSLModel()  # 用于提取 SSL embedding (xlsr/wav2vec)
+
 
         self.aasist_all = XLSR2_AASIST(aasist_conf)
         self.aasist_speech = XLSR2_AASIST(aasist_conf)
         self.aasist_env = XLSR2_AASIST(aasist_conf)
 
-        # EMA 更新速率（可调）
-        # self.proto_momentum = 0.95
-
-        # self.speech_proto = nn.Parameter(torch.zeros(1, 1024))
 
     def extract_embedding(self, waveform):
         """从波形提取 embedding（最后一层 -> mean pooling）"""
@@ -87,17 +81,7 @@ class Model(nn.Module):
         """egs 包含 mix, ref=[speech, env]"""
         h_all, res_all = self.aasist_all(egs['mix'])
         speech_, env_ = self.spar(egs['mix'])  # ConvTasNet 输出两个波形
-        # speech_, env_ = res['speech'].squeeze()[:, :chunk_size] , res['env'].squeeze()[:, :chunk_size]
 
-        # if self.training:
-        #     # 从 GT ref 提取 embedding 来更新 prototype
-        #     speech_emb = self.extract_embedding(egs["ref"][0])
-        #     self.update_prototypes(speech_emb)
-        #
-        # else:
-        #     # logging.info(self.speech_proto)
-        #     # eval 模式，重新排序
-        #     speech_, env_ = self.resort(self.speech_proto,speech_, env_)
 
         # 下游鉴别器
 

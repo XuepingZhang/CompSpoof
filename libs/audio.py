@@ -4,7 +4,7 @@ import os
 import numpy as np
 import scipy.io.wavfile as wf
 import soundfile as sf
-from Unet.conf import data_root
+from conf import data_root
 
 MAX_INT16 = np.iinfo(np.int16).max
 

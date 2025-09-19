@@ -4,32 +4,19 @@ chunk_size = chunk_len * fs
 epochs=100
 batch_size=64
 
-# data configure:
+joint=True # joint learning setting
 
-# train_data = '/SMIIPdata2/zxp/composition_antispoofing/labels/full/train_label1.txt'
-# dev_data = '/SMIIPdata2/zxp/composition_antispoofing/labels/full/dev_label1.txt'
-# eval_data = '/SMIIPdata2/zxp/composition_antispoofing/labels/full/test_label1.txt'
-# data_root = '/SMIIPdata2/zxp/composition_antispoofing/dataset'
-# checkpoint=f'/SMIIPdata2/zxp/composition_antispoofing/Unet/weight/batch_{batch_size}_epoch_{epochs}'
-# joint=False
-# if joint:
-#     checkpoint = f'/SMIIPdata2/zxp/composition_antispoofing/Unet/weight/batch_{batch_size}_epoch_{epochs}_joint'
-#     start_end = 3
-# else:
-#     checkpoint = f'/SMIIPdata2/zxp/composition_antispoofing/Unet/weight/batch_{batch_size}_epoch_{epochs}_no_joint'
-#     start_end = epochs
+train_data = 'train_label.txt'
+dev_data = 'dev_label.txt'
+eval_data = 'test_label.txt'
+data_root = '/your_path'
+checkpoint=f'/your_path/weight/batch_{batch_size}_epoch_{epochs}'
 
-train_data = '/work/xz464/labels/full/train_label1.txt'
-dev_data = '/work/xz464/labels/full/dev_label1.txt'
-eval_data = '/work/xz464/labels/full/test_label1.txt'
-data_root = '/work/xz464/dataset'
-checkpoint=f'/work/xz464/composition_antispoofing_dkucc/Unet/weight/batch_{batch_size}_epoch_{epochs}'
-joint=True
 if joint:
-    checkpoint = f'/work/xz464/composition_antispoofing_dkucc/Unet/weight/batch_{batch_size}_epoch_{epochs}_joint5'
-    start_end = 5
+    start_end = 5 # joint learning from epoch 5
+    checkpoint = f'/your_path/weight/batch_{batch_size}_epoch_{epochs}_joint_{start_end}'
 else:
-    checkpoint = f'/work/xz464/composition_antispoofing_dkucc/Unet/weight/batch_{batch_size}_epoch_{epochs}_no_joint'
+    checkpoint = f'/your_path/weight/batch_{batch_size}_epoch_{epochs}_no_joint'
     start_end = epochs
 
 # trainer config

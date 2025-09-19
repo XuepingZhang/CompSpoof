@@ -237,10 +237,7 @@ class Trainer(object):
 
         pit_sisnr = -th.sum(max_perutt) / N
 
-        # ===== 分类损失 前面几个epoch不用分离得到的预测结果，后面几个才用=====
 
-
-        # ===== 一致性评价 评估分离模型保留antispoofing特征的程度=====
         log_p_speech_ = F.softmax(res_speech_, dim=-1)
         p_speech = F.softmax(res_speech.detach(), dim=-1)
         L_cons_speech = F.cosine_similarity(log_p_speech_, p_speech, dim=-1).mean()
@@ -318,32 +315,7 @@ class Trainer(object):
             sf.write(os.path.join(save_dir, f"ref0_{idx}_label{label.tolist()}.wav"), ref0, sr)
             sf.write(os.path.join(save_dir, f"ref1_{idx}_label{label.tolist()}.wav"), ref1, sr)
 
-    def train1(self, data_loader, end):
-        self.logger.info("Set train mode...")
-        self.nnet.train()
-        reporter = ProgressReporter(self.logger, period=self.logging_period)
-        i = 0
-        all_MSE = 0
 
-        for egs in data_loader:
-            # load to gpu
-            egs = load_obj(egs, self.device)
-
-            self.optimizer.zero_grad()
-            loss, MSE = self.compute_loss(egs, end)
-            loss.backward()
-            if self.clip_norm:
-                clip_grad_norm_(self.nnet.parameters(), self.clip_norm)
-            self.optimizer.step()
-            all_MSE += MSE
-            reporter.add(loss.item())
-
-            # 每个 batch 随机保存一个 mix/ref0/ref1
-            self.save_random_example(egs, save_dir="./test")
-
-            i += 1
-
-        return reporter.report(), all_MSE
 
     def eval(self, data_loader, mode):
         self.logger.info(f"Set {mode} mode...")
@@ -362,7 +334,7 @@ class Trainer(object):
 
         all_labels, all_preds = [], []
         file2labels, file2preds = defaultdict(list), defaultdict(list)
-        save_idx = 0  # 保存音频的编号
+        save_idx = 0
         out_dir = "./test/"
         os.makedirs(out_dir, exist_ok=True)
 

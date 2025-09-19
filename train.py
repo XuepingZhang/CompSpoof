@@ -7,12 +7,12 @@ import pprint
 import argparse
 import random
 
-from Unet.libs.trainer import SiSnrTrainer
-from Unet.libs.dataset import make_dataloader
-from Unet.libs.utils import dump_json, get_logger
+from libs.trainer import SiSnrTrainer
+from libs.dataset import make_dataloader
+from libs.utils import dump_json, get_logger
 from model import Model
 
-from Unet.conf import trainer_conf, train_data, dev_data, eval_data, chunk_size,checkpoint,epochs,batch_size,unet_conf,start_end
+from conf import trainer_conf, train_data, dev_data, eval_data, chunk_size,checkpoint,epochs,batch_size,unet_conf,start_end
 
 logger = get_logger(__name__)
 
@@ -62,14 +62,14 @@ def run(args):
 
 
 if __name__ == "__main__":
-    # os.environ["CUDA_VISIBLE_DEVICES"] = "0,1,2,3"
+
     parser = argparse.ArgumentParser(
         description=
         "Command to start ConvTasNet training, configured from conf.py",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument("--gpus",
                         type=str,
-                        default="0,1,2,3,4,5,6,7",
+                        default="0,1,2,3",
                         help="Training on which GPUs "
                         "(one or more, egs: 0, \"0,1\")")
 
