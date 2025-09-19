@@ -11,7 +11,7 @@ This repository contains the official implementation of our ICASSP 2025 paper:
 
 We introduce **CompSpoof**, a new dataset for component-level antispoofing, where either the speech component, the environmental component, or both can be spoofed.
 
-*   📥 **Download link:** [CompSpoof dataset](https://your-dataset-link.com/)
+*   📥 **Download link:** [CompSpoof dataset](https://huggingface.co/datasets/Sage99/CompSpoof)
 *   📖 **Details & documentation:** [CompSpoof description](https://your-dataset-doc-link.com/)
 
 ***
