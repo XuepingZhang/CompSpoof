@@ -21,7 +21,7 @@ def make_dataloader(train=True,
     labels = {}
 
     label_map = {"spoof_spoof": [0,0,0], "bonafide_spoof": [1,0,0]
-        , "spoof_bonafide": [0,1,0], "bonafide_bonafide": [1,1,0], "original": [1,1,1]}
+        , "spoof_bonafide": [0,1,0], "bonafide_bonafide": [1,1,0], "original":[1,1,1]}
     with open(data_kwargs, "r", encoding="utf-8") as f:
         for i, line in enumerate(f):
             parts = line.strip().split()
