@@ -6,9 +6,9 @@ batch_size=64
 
 joint=True # joint learning setting
 
-train_data = 'train_label.txt'
-dev_data = 'dev_label.txt'
-eval_data = 'test_label.txt'
+train_data = 'CompSpoof_train.txt'
+dev_data = 'CompSpoof_dev.txt'
+eval_data = 'CompSpoof_eval.txt'
 data_root = '/your_path'
 checkpoint=f'/your_path/weight/batch_{batch_size}_epoch_{epochs}'
 
