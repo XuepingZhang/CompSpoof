@@ -24,7 +24,6 @@ cd CompSpoof
 conda create -n compspoof python=3.10
 conda activate compspoof
 pip install -r requirements.txt
-
 ```
 
 ***
@@ -37,7 +36,6 @@ We provide scripts for model training and evaluation:
     python train.py
 
     # Evaluation example
-    bash run_eval.sh
     python train.py --eval_path /path
 
 You can modify the configs in conf.py to reproduce different experiments from the paper.
