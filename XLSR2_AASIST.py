@@ -23,8 +23,7 @@ class SSLModel(nn.Module):
     def __init__(self):
         super(SSLModel, self).__init__()
         
-        cp_path = '/work/xz464/zxp/new_dataset_experiment_dkucc/aasist-main/models/weights/xlsr2_300m.pt'   # Change the pre-trained XLSR model path.
-        # cp_path = '/SMIIPdata2/zxp/composition_antispoofing/conv-tasnet-master/nnet/weight/xlsr2_300m.pt'   # Change the pre-trained XLSR model path.
+        cp_path = 'xlsr2_300m.pt'   # Change the pre-trained XLSR model path.
         model, cfg, task = fairseq.checkpoint_utils.load_model_ensemble_and_task([cp_path], arg_overrides={"device_id": -1})
 
         self.model = model[0]

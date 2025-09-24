@@ -26,64 +26,9 @@ class Model(nn.Module):
         self.aasist_env = XLSR2_AASIST(aasist_conf)
 
 
-    def extract_embedding(self, waveform):
-        """从波形提取 embedding（最后一层 -> mean pooling）"""
-        with torch.no_grad():
-            feat = self.ssl_model.extract_feat(waveform.squeeze(-1))  # [B, T, D]
-            emb = feat.mean(dim=1)  # -> [B, D]
-        return emb
-
-    def update_prototypes(self, speech_emb):
-        speech_mean = speech_emb.mean(dim=0, keepdim=True).detach()
-        with torch.no_grad():
-            if torch.count_nonzero(self.speech_proto) == 0:
-                self.speech_proto.copy_(speech_mean)  # <- in-place 更新
-            else:
-                self.speech_proto.mul_(self.proto_momentum).add_(speech_mean * (1 - self.proto_momentum))
-
-    def resort(self, speech_proto, waveform1, waveform2):
-        """推理时根据 proto 重新排序"""
-        emb1 = self.extract_embedding(waveform1)
-        emb2 = self.extract_embedding(waveform2)
-
-        sim1_speech = F.cosine_similarity(emb1, speech_proto, dim=-1)
-
-        sim2_speech = F.cosine_similarity(emb2, speech_proto, dim=-1)
-
-
-        # 决策：哪个更像 speech
-        return self.reorder_waveforms(sim1_speech, sim2_speech, waveform1, waveform2)
-
-
-    def reorder_waveforms(self, sim1_speech, sim2_speech, waveform1, waveform2):
-        """
-        sim1_speech, sim2_speech: [B] tensor
-        waveform1, waveform2: [B, T] tensor
-        返回: new_waveform1, new_waveform2
-        """
-        # mask: True 表示 sim1 > sim2，False 表示 sim2 >= sim1
-        mask = sim1_speech > sim2_speech  # [B]
-
-        # 初始化输出
-        new_waveform1 = th.zeros_like(waveform1)
-        new_waveform2 = th.zeros_like(waveform2)
-
-        # 按 mask 选择
-        new_waveform1[mask] = waveform1[mask]
-        new_waveform2[mask] = waveform2[mask]
-
-        new_waveform1[~mask] = waveform2[~mask]
-        new_waveform2[~mask] = waveform1[~mask]
-
-        return new_waveform1, new_waveform2
-
     def forward(self, egs):
-        """egs 包含 mix, ref=[speech, env]"""
         h_all, res_all = self.aasist_all(egs['mix'])
-        speech_, env_ = self.spar(egs['mix'])  # ConvTasNet 输出两个波形
-
-
-        # 下游鉴别器
+        speech_, env_ = self.spar(egs['mix'])
 
         h_speech_, res_speech_ = self.aasist_speech(speech_)
         h_env_, res_env_ = self.aasist_env(env_)

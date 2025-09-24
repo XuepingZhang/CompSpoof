@@ -1,13 +1,10 @@
-#!/usr/bin/env python
-
-# wujian@2018
 
 import os
 import pprint
 import argparse
 import random
 
-from libs.trainer import SiSnrTrainer
+from libs.trainer import Trainer_All
 from libs.dataset import make_dataloader
 from libs.utils import dump_json, get_logger
 from model import Model
@@ -20,16 +17,15 @@ logger = get_logger(__name__)
 def run(args):
     gpuids = tuple(map(int, args.gpus.split(",")))
 
-
     nnet = Model()
     # nnet = ConvTasNet(**nnet_conf)
-    trainer = SiSnrTrainer(nnet,
-                           gpuid=gpuids,
-                           checkpoint=checkpoint,
-                           resume=args.resume,
-                           eval_path = args.eval_path,
-                           **trainer_conf,
-                           start_end=start_end)
+    trainer = Trainer_All(nnet,
+                          gpuid=gpuids,
+                          checkpoint=checkpoint,
+                          resume=args.resume,
+                          eval_path = args.eval_path,
+                          **trainer_conf,
+                          start_end=start_end)
 
     data_conf = {
         "train": train_data,

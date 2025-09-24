@@ -3,9 +3,6 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-# -------------------------
-# 基础 UNet 2D 积木
-# -------------------------
 class DoubleConv(nn.Module):
     """(Conv2d -> BN -> ReLU) * 2"""
     def __init__(self, in_ch, out_ch):
@@ -22,7 +19,7 @@ class DoubleConv(nn.Module):
         return self.net(x)
 
 class Down(nn.Module):
-    """下采样"""
+
     def __init__(self, in_ch, out_ch):
         super().__init__()
         self.pool = nn.MaxPool2d(2)
@@ -31,7 +28,7 @@ class Down(nn.Module):
         return self.conv(self.pool(x))
 
 class Up(nn.Module):
-    """上采样 + skip + DoubleConv"""
+
     def __init__(self, in_ch, out_ch):
         super().__init__()
         self.up = nn.ConvTranspose2d(in_ch, in_ch//2, kernel_size=2, stride=2)
@@ -45,16 +42,13 @@ class Up(nn.Module):
         return self.conv(x)
 
 class OutConv(nn.Module):
-    """输出 1x1 卷积"""
     def __init__(self, in_ch, out_ch):
         super().__init__()
         self.proj = nn.Conv2d(in_ch, out_ch, kernel_size=1)
     def forward(self, x):
         return self.proj(x)
 
-# -------------------------
-# UNet 主干
-# -------------------------
+
 class UNet2D(nn.Module):
     def __init__(self, in_ch=1, base_ch=64, num_layers=4, out_ch=2):
         super().__init__()
@@ -73,9 +67,7 @@ class UNet2D(nn.Module):
             y = up(y, skip)
         return self.outc(y)
 
-# -------------------------
-# UNet + STFT 复数 mask + residual refine
-# -------------------------
+
 class UNetSTFTComplexRefine(nn.Module):
     def __init__(self,
                  n_fft=1024, hop_length=256, win_length=1024, center=True,
@@ -89,7 +81,6 @@ class UNetSTFTComplexRefine(nn.Module):
         window = torch.hann_window(self.win_length)
         self.register_buffer("window", window, persistent=False)
 
-        # speech 分离 UNet（复数 mask）
         self.unet_speech = UNet2D(in_ch=1, base_ch=unet_base_ch, num_layers=unet_layers, out_ch=2)
 
 
@@ -147,7 +138,7 @@ class UNetSTFTComplexRefine(nn.Module):
         speech_mag = est_speech_stft.abs().detach()
         residual_mag = residual_stft.abs()
 
-        # 动态缩放因子 = mean(residual_mag) / (mean(speech_mag) + eps)
+        # scale_factor = mean(residual_mag) / (mean(speech_mag) + eps)
         eps = 1e-8
         scale_factor = residual_mag.mean(dim=(1, 2), keepdim=True) / (speech_mag.mean(dim=(1, 2), keepdim=True) + eps)
 
@@ -164,9 +155,7 @@ class UNetSTFTComplexRefine(nn.Module):
         return speech_waveform, bg_waveform
 
 
-# -------------------------
-# 简单自测
-# -------------------------
+
 if __name__ == "__main__":
     torch.manual_seed(0)
     B,L = 2,64000

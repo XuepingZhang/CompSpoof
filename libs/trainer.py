@@ -1,4 +1,3 @@
-# wujian@2018
 import logging
 import os
 import sys
@@ -171,7 +170,6 @@ class Trainer(object):
         optimizer = optim.Adam([
             # spar → lr=1e-3
             {"params": model.spar.parameters(), "lr": 1e-3},
-            # 其他模块 → lr=1e-5
             # {"params": model.ssl_model.parameters(), "lr": 1e-5},
             {"params": model.aasist_all.parameters(), "lr": 1e-5},
             {"params": model.aasist_speech.parameters(), "lr": 1e-5},
@@ -211,49 +209,6 @@ class Trainer(object):
     def compute_loss(self, egs, end=False):
         raise NotImplementedError
 
-    def metrics1(self, egs):
-        # spks x n x S
-        res = th.nn.parallel.data_parallel(self.nnet, egs, device_ids=self.gpuid)
-
-        speech_, env_, res_speech_, res_env_, res_speech, res_env, res_all, h_all, h_speech_, h_env_, h_speech, h_env = res
-
-        ests = (speech_, env_)
-        # spks x n x S
-        refs = egs["ref"]
-        num_spks = len(refs)
-
-        def sisnr_loss(permute):
-            # for one permute
-            return sum(
-                [self.sisnr(ests[s], refs[t])
-                 for s, t in enumerate(permute)]) / len(permute)
-
-        # P x N
-        N = egs["mix"].size(0)
-        sisnr_mat = th.stack(
-            [sisnr_loss(p) for p in permutations(range(num_spks))])
-        max_perutt, _ = th.max(sisnr_mat, dim=0)
-        # si-snr
-
-        pit_sisnr = -th.sum(max_perutt) / N
-
-
-        log_p_speech_ = F.softmax(res_speech_, dim=-1)
-        p_speech = F.softmax(res_speech.detach(), dim=-1)
-        L_cons_speech = F.cosine_similarity(log_p_speech_, p_speech, dim=-1).mean()
-
-        log_p_env_ = F.softmax(res_env_, dim=-1)
-        p_env = F.softmax(res_env.detach(), dim=-1)
-        L_cons_env = F.cosine_similarity(log_p_env_, p_env, dim=-1).mean()
-
-        L_cons = L_cons_speech + L_cons_env
-
-        return (res_all, egs['label'].T[2]), \
-                    (res_speech_, egs['label'].T[0]), \
-                    (res_env_, egs['label'].T[1]), \
-                    pit_sisnr, L_cons
-
-
     def only_eval(self, model_path, eval_loader):
         if not os.path.exists(model_path):
             raise FileNotFoundError(f"Eval mode: model {model_path} not found")
@@ -292,17 +247,13 @@ class Trainer(object):
 
 
     def save_random_example(self, egs, save_dir="./test", sr=16000):
-        """
-        egs: 一个 batch，包含 mix, ref0, ref1 (在GPU上)
-        """
+
         os.makedirs(save_dir, exist_ok=True)
 
-        # 随机选一个样本
         batch_size = egs["mix"].shape[0]
 
         idx = random.randint(0, batch_size - 1)
 
-        # 取出 GPU tensor -> CPU numpy
         label = egs['label'][idx].detach().cpu()
 
         if label.tolist()[-1] != 1:
@@ -310,7 +261,6 @@ class Trainer(object):
             ref0 = egs["ref"][0][idx].detach().cpu().numpy()
             ref1 = egs["ref"][1][idx].detach().cpu().numpy()
 
-            # 保存 wav
             sf.write(os.path.join(save_dir, f"mix_{idx}_label{label.tolist()}.wav"), mix, sr)
             sf.write(os.path.join(save_dir, f"ref0_{idx}_label{label.tolist()}.wav"), ref0, sr)
             sf.write(os.path.join(save_dir, f"ref1_{idx}_label{label.tolist()}.wav"), ref1, sr)
@@ -360,26 +310,23 @@ class Trainer(object):
                 all_labels.extend(true_labels)
                 all_preds.extend(pred_labels)
 
-                # 如果是 eval 模式，收集文件级别信息
 
-                file_names = egs["file"]  # 假设是 list[str]
+                file_names = egs["file"]
                 for f, t, p in zip(file_names, true_labels, pred_labels):
                     file2labels[f].append(t)
                     file2preds[f].append(p)
 
-                # ====== 新增：每个 batch 保存一组音频 ======
+
                 idx_candidates = [i for i, t in enumerate(true_labels) if t != 0]
                 if len(idx_candidates) > 0:
                     idx = random.choice(idx_candidates)
 
-                    # 取出对应样本，转 CPU
                     speech_sample = speech_[idx].detach().cpu()
                     env_sample = env_[idx].detach().cpu()
                     ref0_sample = egs['ref'][0][idx].detach().cpu()
                     ref1_sample = egs['ref'][1][idx].detach().cpu()
                     mix_sample = egs['mix'][idx].detach().cpu()
 
-                    # 保存音频 (默认16kHz)
                     torchaudio.save(os.path.join(out_dir, f"{mode}_mix_{save_idx}_label{true_labels[save_idx]}.wav"),
                                     mix_sample.unsqueeze(0), 16000)
                     torchaudio.save(os.path.join(out_dir, f"{mode}_speech_{save_idx}_label{true_labels[save_idx]}.wav"),
@@ -392,9 +339,7 @@ class Trainer(object):
                                     ref1_sample.unsqueeze(0), 16000)
 
                     save_idx += 1
-                # ====== 新增结束 ======
 
-        # macro 平均
         precision = precision_score(all_labels, all_preds, average='macro')
         recall = recall_score(all_labels, all_preds, average="macro")
         f1 = f1_score(all_labels, all_preds, average="macro")
@@ -402,7 +347,7 @@ class Trainer(object):
         recall_per_class = recall_score(all_labels, all_preds, average=None)
         f1_per_class = f1_score(all_labels, all_preds, average=None)
 
-        import numpy as np
+
         all_labels_arr = np.array(all_labels)
         all_preds_arr = np.array(all_preds)
 
@@ -421,25 +366,23 @@ class Trainer(object):
 
 
 
-        # 文件级别指标
+        # file_level
         file_labels, file_preds = [], []
         for f in file2labels.keys():
-            # 真实标签（多数情况下应该一致，取第一个即可）
+
             true_label = file2labels[f][0]
-            # 投票决定预测标签
+
             pred_counter = Counter(file2preds[f])
             pred_label = pred_counter.most_common(1)[0][0]
 
             file_labels.append(true_label)
             file_preds.append(pred_label)
 
-        # 宏平均
         file_acc = accuracy_score(file_labels, file_preds)
         file_precision = precision_score(file_labels, file_preds, average="macro")
         file_recall = recall_score(file_labels, file_preds, average="macro")
         file_f1 = f1_score(file_labels, file_preds, average="macro")
 
-        # 每类指标
         report = classification_report(file_labels, file_preds, digits=4)
 
         self.logger.info("\n========== File-level Evaluation ==========")
@@ -458,7 +401,7 @@ class Trainer(object):
         self.logger.info(f"Set {mode} mode...")
         self.nnet.eval()
 
-        # 收集结果
+
         all_metrics = {
             "speech_sep": {"labels": [], "preds": []},
             "speech_ori": {"labels": [], "preds": []},
@@ -467,7 +410,7 @@ class Trainer(object):
             "mix": {"labels": [], "preds": []},
         }
 
-        # 隐藏层特征收集
+
         feats = {
             "speech_sep": {"x": [], "y": []},
             "speech_ori": {"x": [], "y": []},
@@ -480,25 +423,21 @@ class Trainer(object):
             for egs in data_loader:
                 egs = load_obj(egs, self.device)
 
-                # 标签
                 lbl_speech = egs["label"][:, 0].cpu().numpy()
                 lbl_env = egs["label"][:, 1].cpu().numpy()
                 lbl_mix = egs["label"][:, 2].cpu().numpy()
 
-                # 模型前向
                 res = th.nn.parallel.data_parallel(self.nnet, egs, device_ids=self.gpuid)
                 (speech_, env_, res_speech_, res_env_, res_speech,
                  res_env, res_all, h_all, h_speech_, h_env_,
                  h_speech, h_env) = res
 
-                # 预测
                 pred_speech_ = res_speech_.argmax(dim=1).cpu().numpy()
                 pred_speech = res_speech.argmax(dim=1).cpu().numpy()
                 pred_env_ = res_env_.argmax(dim=1).cpu().numpy()
                 pred_env = res_env.argmax(dim=1).cpu().numpy()
                 pred_mix = res_all.argmax(dim=1).cpu().numpy()
 
-                # 累积标签+预测
                 all_metrics["speech_sep"]["labels"].extend(lbl_speech)
                 all_metrics["speech_sep"]["preds"].extend(pred_speech_)
                 all_metrics["speech_ori"]["labels"].extend(lbl_speech)
@@ -510,7 +449,6 @@ class Trainer(object):
                 all_metrics["mix"]["labels"].extend(lbl_mix)
                 all_metrics["mix"]["preds"].extend(pred_mix)
 
-                # ===== 保存隐藏层特征（只存二分类 spoof/bonafide） =====
                 feats["speech_sep"]["x"].append(h_speech_.cpu().numpy())
                 feats["speech_sep"]["y"].append(lbl_speech)
                 feats["speech_ori"]["x"].append(h_speech.cpu().numpy())
@@ -522,7 +460,6 @@ class Trainer(object):
                 feats["mix"]["x"].append(h_all.cpu().numpy())
                 feats["mix"]["y"].append(lbl_mix)
 
-        # ====== 计算并打印指标 ======
         for name, d in all_metrics.items():
             labels, preds = np.array(d["labels"]), np.array(d["preds"])
             acc = accuracy_score(labels, preds)
@@ -531,7 +468,6 @@ class Trainer(object):
             f1 = f1_score(labels, preds, average="macro", zero_division=0)
             self.logger.info(f"[{mode}] {name} - Acc={acc:.4f}, Pre={pre:.4f}, Rec={rec:.4f}, F1={f1:.4f}")
 
-        # ====== 保存隐藏层特征 ======
         save_dir = os.path.join(self.checkpoint, 'feature')
         os.makedirs(save_dir, exist_ok=True)
         for name, d in feats.items():
@@ -596,33 +532,11 @@ class Trainer(object):
             self.cur_epoch, num_epochs))
 
 
-class SiSnrTrainer(Trainer):
+class Trainer_All(Trainer):
     def __init__(self, *args, **kwargs):
-        super(SiSnrTrainer, self).__init__(*args, **kwargs)
+        super(Trainer_All, self).__init__(*args, **kwargs)
 
         self.criterion = nn.MSELoss()
-    def sisnr(self, x, s, eps=1e-8):
-        """
-        Arguments:
-        x: separated signal, N x S tensor
-        s: reference signal, N x S tensor
-        Return:
-        sisnr: N tensor
-        """
-
-        def l2norm(mat, keepdim=False):
-            return th.norm(mat, dim=-1, keepdim=keepdim)
-
-        if x.shape != s.shape:
-            raise RuntimeError(
-                "Dimention mismatch when calculate si-snr, {} vs {}".format(
-                    x.shape, s.shape))
-        x_zm = x - th.mean(x, dim=-1, keepdim=True)
-        s_zm = s - th.mean(s, dim=-1, keepdim=True)
-        t = th.sum(
-            x_zm * s_zm, dim=-1,
-            keepdim=True) * s_zm / (l2norm(s_zm, keepdim=True)**2 + eps)
-        return 20 * th.log10(eps + l2norm(t) / (l2norm(x_zm - t) + eps))
 
     def compute_loss(self, egs, end=False):
         # spks x n x S
@@ -633,19 +547,19 @@ class SiSnrTrainer(Trainer):
         label_env = egs['label'].T[1]
         label_all = egs['label'].T[2]
 
-        # 整体分类损失 (总是计算)
+
         weights = th.tensor([0.2, 0.8], device=res_all.device, dtype=th.float32)
         L_cls_all = F.cross_entropy(res_all, label_all.long(), weight=weights)
-        # mask: 只对 label_all == 0 的样本计算分离相关 loss
-        mask = (label_all == 0)
-        mask_count = mask.sum().item()  # 有多少个样本参与
 
-        # ===== 分离损失 (MSER) =====
+        mask = (label_all == 0)
+        mask_count = mask.sum().item()
+
+        # ===== (MSE) =====
 
         MSE = self.criterion(speech_,egs['ref'][0]) + self.criterion(env_,egs['ref'][1])
 
 
-        # ===== 分类损失 =====
+        # ===== class loss =====
         if end:
             L_cls_speech_, L_cls_env_ = 0.0, 0.0
             L_cons = 0.0
@@ -653,7 +567,7 @@ class SiSnrTrainer(Trainer):
                 L_cls_speech_ = F.cross_entropy(res_speech_[mask], label_speech[mask].long())
                 L_cls_env_ = F.cross_entropy(res_env_[mask], label_env[mask].long())
 
-                # 一致性损失
+
                 log_p_speech_ = F.log_softmax(res_speech_[mask], dim=-1)
                 p_speech = F.softmax(res_speech.detach()[mask], dim=-1)
                 L_cons_speech = F.kl_div(log_p_speech_, p_speech, reduction='batchmean')

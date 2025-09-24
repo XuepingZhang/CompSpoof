@@ -55,15 +55,13 @@ import logging
 
 
 def compute_dcf(bonafide_scores, spoof_scores, threshold, C_miss=1.0, C_fa=10.0, P_spoof=0.05):
-    # miss: 真实 bonafide 被判为 spoof（s < threshold）
+
     P_miss = np.mean(bonafide_scores < threshold)
-    # fa: 伪造 spoof 被判为 bonafide（s >= threshold）
     P_fa = np.mean(spoof_scores >= threshold)
     DCF = C_miss * (1 - P_spoof) * P_miss + C_fa * P_spoof * P_fa
     return DCF
 
 def compute_min_dcf(bonafide_scores, spoof_scores, C_miss=1.0, C_fa=10.0, P_spoof=0.05):
-    # 遍历所有阈值求最小 DCF
     all_scores = np.concatenate([bonafide_scores, spoof_scores])
     thresholds = np.sort(np.unique(all_scores))
     dcf_list = [compute_dcf(bonafide_scores, spoof_scores, t, C_miss, C_fa, P_spoof) for t in thresholds]
@@ -80,7 +78,6 @@ def calculate_EER_DCF_eval(score, labels):
     return overall_eer * 100, overall_min_dcf, overall_act_dcf
 
 def calculate_EER_evel(cm_scores_file, output_file, unseen_types):
-    # 读取数据
     cm_data = np.genfromtxt(cm_scores_file, dtype=str)
     paths = cm_data[:, 0]
     scores = cm_data[:, 1].astype(np.float32)

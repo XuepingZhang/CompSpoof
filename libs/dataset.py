@@ -1,5 +1,3 @@
-# wujian@2018
-
 import random
 import torch as th
 import numpy as np
@@ -26,7 +24,7 @@ def make_dataloader(train=True,
         for i, line in enumerate(f):
             parts = line.strip().split()
             if len(parts) < 4:
-                continue  # 跳过不完整的行
+                continue
             a, b, c, d = parts[:4]
             mix_data[i] = a
             ref_data0[i] = b
@@ -59,19 +57,16 @@ class Dataset_(object):
     def __getitem__(self, index):
         key = self.mix.index_keys[index]
 
-        # 获取 mix 音频
         mix = self.mix[key][0].astype(np.float32)
         path = self.mix[key][1]
         mix_len = len(mix)
 
-        # 对 ref 做截取或补齐
         ref = []
         for reader in self.ref:
             r = reader[key][0].astype(np.float32)
             if len(r) >= mix_len:
                 r = r[:mix_len]
             else:
-                # 长度不足则补零
                 r = np.pad(r, (0, mix_len - len(r)), mode="constant")
             ref.append(r)
 
