@@ -23,8 +23,16 @@ git clone https://github.com/XuepingZhang/CompSpoof.git
 cd CompSpoof
 conda create -n compspoof python=3.10
 conda activate compspoof
+git clone https://github.com/facebookresearch/fairseq.git fairseq_dir
+cd fairseq_dir
+git checkout a54021305d6b3c
+pip install --editable ./
 pip install -r requirements.txt
 ```
+
+**Pretrained XLSR**
+
+The pretrained model XLSR can be found at this [link](https://dl.fbaipublicfiles.com/fairseq/wav2vec/xlsr2_300m.pt).
 
 ***
 
