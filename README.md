@@ -33,9 +33,7 @@ Below are audio samples from the **CompSpoof** dataset. For each class, we provi
   <tbody>
     <tr>
       <td>
-        <audio controls>
           [bonafide_0_028.mp3](audio_demo/class0/bonafide_0_028.mp3)
-        </audio>
       </td>
     </tr>
   </tbody>
