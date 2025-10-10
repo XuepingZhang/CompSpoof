@@ -24,20 +24,13 @@ Below are audio samples from the **CompSpoof** dataset. For each class, we provi
 
 **Description:** Original bona fide speech and corresponding environment audio without mixing
 
-<table>
-  <thead>
-    <tr>
-      <th>Original</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>
-          [bonafide_0_028.mp3](audio_demo/class0/bonafide_0_028.mp3)
-      </td>
-    </tr>
-  </tbody>
-</table>
+
+
+| Original | 
+|:------:|
+| 🎧 [bonafide_bonafide_0471.wav](audio_demo/class0/bonafide_0_028.mp3) | 
+
+
 
 #### Class 1 — Bona fide + Bona fide 
 
@@ -45,34 +38,11 @@ Below are audio samples from the **CompSpoof** dataset. For each class, we provi
 
 **Description:** Bona fide speech mixed with another bona fide environmental audio
 
-<table>
-  <thead>
-    <tr>
-      <th>Mixed</th>
-      <th>Speech</th>
-      <th>Environment</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>
-        <audio controls>
-          <source src="audio_demo/class1/bonafide_bonafide_0471.wav" type="audio/mpeg">
-        </audio>
-      </td>
-      <td>
-      <audio controls>
-          <source src="audio_demo/class1/D_0002500345.flac" type="audio/mpeg">
-        </audio>
-      </td>
-      <td>
-      <audio controls>
-          <source src="audio_demo/class1/-OQ3KFwzLCI_474.mp3" type="audio/mpeg">
-        </audio>
-      </td>
-    </tr>
-  </tbody>
-</table>
+
+| Mixed | Speech | Environment |
+|:------:|:------:|:------------:|
+| 🎧 [bonafide_bonafide_0471.wav](audio_demo/class1/bonafide_bonafide_0471.wav) | 🎧 [D_0002500345.flac](audio_demo/class1/D_0002500345.flac) | 🎧 [-OQ3KFwzLCI_474.mp3](audio_demo/class1/-OQ3KFwzLCI_474.mp3) |
+
 
 
 #### Class 2 — Spoofed Speech + Bona fide Environment 
