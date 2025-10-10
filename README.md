@@ -17,7 +17,6 @@ We introduce **CompSpoof**, a new dataset for component-level antispoofing, wher
 ### 🎧 Audio Examples
 Below are audio samples from the **CompSpoof** dataset. For each class, we provide the **mixed/original audio**, along with the **speech** and **environment** sources. 
 
---- 
 
 #### Class 0 — Original 
 
@@ -35,7 +34,7 @@ Below are audio samples from the **CompSpoof** dataset. For each class, we provi
     <tr>
       <td>
         <audio controls>
-          <source src="audio_demo/class0/bonafide_0_028.mp3" type="audio/mpeg">
+          [bonafide_0_028.mp3](audio_demo/class0/bonafide_0_028.mp3)
         </audio>
       </td>
     </tr>
