@@ -1,6 +1,6 @@
-# &#x20;Component-Level Audio Antispoofing (ICASSP 2026)
+# &#x20;Component-Level Audio Antispoofing (ICASSP 2026, under review)
 
-This repository contains the official implementation of our ICASSP 2025 paper:
+This repository contains the official implementation of our ICASSP 2026 paper (under review):
 
 **“**CompSpoof: A Dataset and Joint Learning Framework for Component-Level Audio Anti-spoofing Countermeasures**”**\
 📄 [Paper on arXiv](https://arxiv.org/abs/2509.15804)
