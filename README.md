@@ -72,7 +72,7 @@ You can modify the configs in conf.py to reproduce different experiments from th
 If you find this work useful, please cite our paper:
 
 ```
-@misc{zhang2025compspoofdatasetjointlearning,
+@misc{zhang2026compspoofdatasetjointlearning,
       title={CompSpoof: A Dataset and Joint Learning Framework for Component-Level Audio Anti-spoofing Countermeasures}, 
       author={Xueping Zhang and Liwei Jin and Yechen Wang and Linxi Li and Ming Li},
       year={2025},
