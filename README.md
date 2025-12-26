@@ -84,7 +84,9 @@ If you find this work useful, please cite our paper:
 ```
 
 ## 🔏 License 
- [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/deed.en) 
+
+ The code is released under [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/deed.en) license.
+
 ---
 
 ## 10. Contact Information
