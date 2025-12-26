@@ -83,3 +83,11 @@ If you find this work useful, please cite our paper:
 }
 ```
 
+## 🔏 License 
+ [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/deed.en) 
+---
+
+## 10. Contact Information
+
+For questions, issues, or collaboration inquiries, please contact:
+* ✉️ Email: [xueping.zhang@dukekunshan.edu.cn](xueping.zhang@dukekunshan.edu.cn)
