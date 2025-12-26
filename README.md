@@ -89,7 +89,7 @@ If you find this work useful, please cite our paper:
 
 ---
 
-## 10. Contact Information
+## ✉️  Contact Information
 
 For questions, issues, or collaboration inquiries, please contact:
-* ✉️ Email: [xueping.zhang@dukekunshan.edu.cn](xueping.zhang@dukekunshan.edu.cn)
+* Email: [xueping.zhang@dukekunshan.edu.cn](xueping.zhang@dukekunshan.edu.cn)
