@@ -15,7 +15,7 @@ We expanded CompSpoof dataset to CompSpoofV2, which significantly expands the di
 
 Building upon CompSpoofV2 dataset and separation-enhanced joint learning framework, we lunched the **ICME 2026 Environment-Aware Speech and Sound Deepfake Detection Challenge (ESDD2)**. We warmly invite researchers from both academia and industry to participate in this challenge, exploring robust and effective solutions for these critical deepfake detection tasks.
 
-🖥️ ESDD2 website: https://sites.google.com/view/esdd-challenge/esdd-challenges/esdd-2/description
+🖥️ ESDD2 Challenge website: https://sites.google.com/view/esdd-challenge/esdd-challenges/esdd-2/description
 
 ---
 
