@@ -7,6 +7,18 @@ This repository contains the official implementation of our ICASSP 2026 paper (u
 
 ***
 
+
+## 📢 NEWS!!
+We expanded CompSpoof dataset to CompSpoofV2, which significantly expands the diversity of attack sources, environmental sounds, and mixing strategies. ✨ In addition, newly generated audio samples are distributed across the test set and are specifically designed to serve as detection data under unseen conditions.
+
+🤗 CompSpoofV2 Details & Download Link: https://xuepingzhang.github.io/CompSpoof-V2-Dataset/
+
+Building upon CompSpoofV2 dataset and separation-enhanced joint learning framework, we lunched the **ICME 2026 Environment-Aware Speech and Sound Deepfake Detection Challenge (ESDD2)**. We warmly invite researchers from both academia and industry to participate in this challenge, exploring robust and effective solutions for these critical deepfake detection tasks.
+
+🖥️ ESDD2 website: https://sites.google.com/view/esdd-challenge/esdd-challenges/esdd-2/description
+
+---
+
 ## 🔊 CompSpoof Dataset
 
 We introduce **CompSpoof**, a new dataset for component-level antispoofing, where either the speech component, the environmental component, or both can be spoofed.
@@ -72,16 +84,15 @@ You can modify the configs in conf.py to reproduce different experiments from th
 If you find this work useful, please cite our paper:
 
 ```
-@misc{zhang2025compspoofdatasetjointlearning,
+@inproceedings{zhang2025compspoofdatasetjointlearning,
       title={CompSpoof: A Dataset and Joint Learning Framework for Component-Level Audio Anti-spoofing Countermeasures}, 
       author={Xueping Zhang and Liwei Jin and Yechen Wang and Linxi Li and Ming Li},
-      year={2025},
-      eprint={2509.15804},
-      archivePrefix={arXiv},
-      primaryClass={cs.SD},
-      url={https://arxiv.org/abs/2509.15804}, 
+      year={2026},
+      booktitle={IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP)},
 }
 ```
+
+
 
 ## 🔏 License 
 
